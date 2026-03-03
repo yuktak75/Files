@@ -1,0 +1,68 @@
+.detail-container { max-width: 900px; margin: 0 auto; }
+
+.detail-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  overflow: hidden;
+}
+
+.detail-cover {
+  background: #eaf4fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.cover-placeholder-lg { font-size: 5rem; }
+
+.detail-info { padding: 2rem; }
+
+.category-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1a5276;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #eaf4fb;
+  padding: 0.2em 0.7em;
+  border-radius: 4px;
+}
+
+.detail-title { font-size: 1.8rem; font-weight: 700; color: #222; margin: 0.7rem 0 0.3rem; line-height: 1.2; }
+
+.detail-meta { font-size: 0.85rem; color: #aaa; margin-bottom: 1rem; }
+
+.detail-body { font-size: 0.95rem; color: #555; line-height: 1.7; margin-bottom: 1.5rem; }
+
+.copies-info { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+.copy-stat { text-align: center; }
+.copy-stat strong { display: block; font-size: 1.5rem; font-weight: 700; color: #333; }
+.copy-stat span { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+.copy-stat.available strong { color: #1e8449; }
+.copy-stat.issued strong { color: #c0392b; }
+
+.btn-borrow-lg {
+  background: #1a5276; color: white; border: none;
+  padding: 0.8rem 2rem; border-radius: 6px;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-borrow-lg:hover { background: #154360; }
+
+.login-prompt, .no-copies-msg { font-size: 0.9rem; color: #888; margin-top: 0.5rem; }
+.login-prompt a { color: #1a5276; font-weight: 600; }
+.alert-error { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; border-radius: 6px; padding: 0.6rem 1rem; margin-bottom: 0.8rem; font-size: 0.88rem; }
+.alert-success { background: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; border-radius: 6px; padding: 0.6rem 1rem; margin-bottom: 0.8rem; font-size: 0.88rem; }
+.error-state { text-align: center; color: #aaa; padding: 3rem; }
+
+@media (max-width: 640px) {
+  .detail-card { grid-template-columns: 1fr; }
+}

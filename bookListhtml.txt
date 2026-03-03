@@ -1,0 +1,31 @@
+<div class="page-header">
+  <h1>Browse Books</h1>
+  <p class="subtitle">Discover and borrow from our collection</p>
+</div>
+
+<div class="filters-bar">
+  <input #searchInput type="text" placeholder="Search by title or ISBN..." class="search-input" />
+
+  <select class="category-select" (change)="onCategoryChange(($event.target as HTMLSelectElement).value)">
+    <option value="">All Categories</option>
+    <option *ngFor="let cat of categories; trackBy: trackByBookId" [value]="cat">{{ cat }}</option>
+  </select>
+</div>
+
+<div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+<div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+<div class="books-grid" *ngIf="!isLoading">
+  <app-book-card
+    *ngFor="let book of books; trackBy: trackByBookId"
+    [book]="book"
+    [showBorrowButton]="true"
+    (borrowClicked)="onBorrow($event)">
+  </app-book-card>
+</div>
+
+<div class="empty-state" *ngIf="!isLoading && books.length === 0">
+  <p>No books found. Try a different search or category.</p>
+</div>

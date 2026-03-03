@@ -1,0 +1,118 @@
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subject, fromEvent } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { BookService } from '../book.service';
+import { BookCardComponent } from '../book-card/book-card.component';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component';
+import { IssueService } from '../../my-books/issue.service';
+import { AuthService } from '../../auth/auth.service';
+import { Book } from '../../models/book.model';
+
+@Component({
+  selector: 'app-book-list',
+  standalone: true,
+  imports: [CommonModule, BookCardComponent, LoadingSpinnerComponent],
+  templateUrl: './book-list.component.html',
+  styleUrls: ['./book-list.component.css']
+})
+export class BookListComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+
+  books: Book[] = [];
+  categories: string[] = [];
+  selectedCategory = '';
+  isLoading = false;
+  errorMessage = '';
+  successMessage = '';
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private bookService: BookService,
+    private issueService: IssueService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadBooks();
+    this.loadCategories();
+  }
+
+  ngAfterViewInit(): void {
+    // Bonus: switchMap search UX — cancels in-flight requests on rapid keystrokes
+    fromEvent<Event>(this.searchInput.nativeElement, 'input').pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(event => {
+        const query = (event.target as HTMLInputElement).value.trim();
+        this.isLoading = true;
+        if (!query) {
+          return this.bookService.getAll();
+        }
+        return this.bookService.search(query);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: books => { this.books = books; this.isLoading = false; },
+      error: () => { this.isLoading = false; }
+    });
+
+    // Focus search on load
+    this.searchInput.nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadBooks(): void {
+    this.isLoading = true;
+    this.bookService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: books => { this.books = books; this.isLoading = false; },
+      error: () => { this.errorMessage = 'Failed to load books.'; this.isLoading = false; }
+    });
+  }
+
+  loadCategories(): void {
+    this.bookService.getCategories().pipe(takeUntil(this.destroy$)).subscribe({
+      next: cats => this.categories = cats,
+      error: () => {}
+    });
+  }
+
+  onCategoryChange(category: string): void {
+    this.selectedCategory = category;
+    this.isLoading = true;
+    if (!category) {
+      this.loadBooks();
+      return;
+    }
+    this.bookService.getByCategory(category).pipe(takeUntil(this.destroy$)).subscribe({
+      next: books => { this.books = books; this.isLoading = false; },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  onBorrow(book: Book): void {
+    if (!this.authService.isLoggedIn()) {
+      this.errorMessage = 'Please log in to borrow books.';
+      return;
+    }
+    this.issueService.borrowBook(book.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.successMessage = `"${book.title}" borrowed successfully!`;
+        this.loadBooks();
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Failed to borrow book.';
+        setTimeout(() => this.errorMessage = '', 3000);
+      }
+    });
+  }
+
+  trackByBookId(_: number, book: Book): number {
+    return book.id;
+  }
+}

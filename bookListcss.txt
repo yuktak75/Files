@@ -1,0 +1,66 @@
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  color: #1a5276;
+  font-weight: 700;
+}
+
+.subtitle { color: #888; margin-top: 0.2rem; }
+
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus { border-color: #1a5276; }
+
+.category-select {
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.alert-error {
+  background: #fdecea; color: #c0392b;
+  border: 1px solid #f5c6cb; border-radius: 6px;
+  padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem;
+}
+
+.alert-success {
+  background: #d5f5e3; color: #1e8449;
+  border: 1px solid #a9dfbf; border-radius: 6px;
+  padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  padding: 3rem;
+  font-size: 1rem;
+}

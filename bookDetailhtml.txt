@@ -1,0 +1,49 @@
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+<div *ngIf="!isLoading && book" class="detail-container">
+  <div class="detail-card">
+    <div class="detail-cover">
+      <img *ngIf="book.coverImage" [src]="book.coverImage" [alt]="book.title" />
+      <div *ngIf="!book.coverImage" class="cover-placeholder-lg">📖</div>
+    </div>
+
+    <div class="detail-info">
+      <span class="category-tag">{{ book.category | titlecase }}</span>
+      <h1 class="detail-title">{{ book.title }}</h1>
+      <p class="detail-meta">{{ book.publishedYear }} · ISBN: {{ book.isbn }}</p>
+      <p class="detail-body">{{ book.body }}</p>
+
+      <div class="copies-info">
+        <div class="copy-stat">
+          <strong>{{ book.totalCopies }}</strong><span>Total</span>
+        </div>
+        <div class="copy-stat available">
+          <strong>{{ book.availableCopies }}</strong><span>Available</span>
+        </div>
+        <div class="copy-stat issued">
+          <strong>{{ book.issuedCopies }}</strong><span>Issued</span>
+        </div>
+      </div>
+
+      <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+
+      <button
+        *ngIf="authService.isLoggedIn() && book.availableCopies > 0"
+        class="btn-borrow-lg"
+        (click)="borrow()">
+        Borrow This Book
+      </button>
+
+      <p *ngIf="!authService.isLoggedIn()" class="login-prompt">
+        <a routerLink="/auth/login">Log in</a> to borrow this book.
+      </p>
+
+      <p *ngIf="book.availableCopies === 0" class="no-copies-msg">
+        All copies are currently issued.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!isLoading && errorMessage && !book" class="error-state">{{ errorMessage }}</div>
