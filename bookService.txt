@@ -1,0 +1,54 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, catchError, retry, throwError } from 'rxjs';
+import { Book } from '../models/book.model';
+
+const API = 'http://localhost:3001/api/books';
+
+@Injectable({ providedIn: 'root' })
+export class BookService {
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Book[]> {
+    return this.http.get<Book[]>(`${API}/detailed`).pipe(
+      retry(1),
+      catchError(err => {
+        console.error('Failed to load books', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getById(id: number): Observable<Book> {
+    return this.http.get<Book>(`${API}/detailed/${id}`);
+  }
+
+  search(query: string): Observable<Book[]> {
+    const params = new HttpParams().set('q', query);
+    return this.http.get<Book[]>(`${API}/search`, { params });
+  }
+
+  getByCategory(category: string): Observable<Book[]> {
+    return this.http.get<Book[]>(`${API}/category/${category}`);
+  }
+
+  getCategories(): Observable<string[]> {
+    return this.http.get<string[]>(`${API}/categories/list`);
+  }
+
+  getAvailable(): Observable<Book[]> {
+    return this.http.get<Book[]>(`${API}/available`);
+  }
+
+  create(bookData: Partial<Book>): Observable<Book> {
+    return this.http.post<Book>(`${API}/create`, bookData);
+  }
+
+  update(id: number, bookData: Partial<Book>): Observable<Book> {
+    return this.http.put<Book>(`${API}/${id}/update`, bookData);
+  }
+
+  delete(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${API}/${id}/delete`);
+  }
+}
