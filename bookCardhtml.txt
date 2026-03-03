@@ -1,0 +1,32 @@
+<div class="book-card" appHighlight [highlightColor]="'#eaf4fb'"
+  [class.unavailable]="book.availableCopies === 0">
+
+  <div class="book-cover">
+    <img *ngIf="book.coverImage; else noCover" [src]="book.coverImage" [alt]="book.title" />
+    <ng-template #noCover>
+      <div class="cover-placeholder">📖</div>
+    </ng-template>
+  </div>
+
+  <div class="book-info">
+    <span class="book-category">{{ book.category | titlecase }}</span>
+    <h3 class="book-title">{{ book.title | truncate:50 }}</h3>
+    <p class="book-body">{{ book.body | truncate:80 }}</p>
+    <p class="book-year">{{ book.publishedYear }}</p>
+
+    <div class="book-footer">
+      <span class="copies-badge" [class.no-copies]="book.availableCopies === 0">
+        {{ book.availableCopies > 0 ? book.availableCopies + ' available' : 'Unavailable' }}
+      </span>
+      <div class="book-actions">
+        <a [routerLink]="['/books', book.id]" class="btn-detail">Details</a>
+        <button
+          *ngIf="showBorrowButton && book.availableCopies > 0"
+          class="btn-borrow"
+          (click)="onBorrow()">
+          Borrow
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
