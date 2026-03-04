@@ -1,0 +1,55 @@
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Book } from '../../models/book.model';
+
+@Component({
+  selector: 'app-book-form',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './book-form.component.html',
+  styleUrls: ['./book-form.component.css']
+})
+export class BookFormComponent implements OnInit {
+  @Input() book: Book | null = null;
+  @Output() formSubmit = new EventEmitter<Partial<Book>>();
+  @Output() formCancel = new EventEmitter<void>();
+
+  bookForm!: FormGroup;
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    this.bookForm = this.fb.group({
+      title: ['', Validators.required],
+      body: ['', Validators.required],
+      isbn: [''],
+      category: [''],
+      publishedYear: [null],
+      totalCopies: [1, [Validators.required, Validators.min(1)]]
+    });
+
+    if (this.book) {
+      this.bookForm.patchValue({
+        title: this.book.title,
+        body: this.book.body,
+        isbn: this.book.isbn,
+        category: this.book.category,
+        publishedYear: this.book.publishedYear,
+        totalCopies: this.book.totalCopies
+      });
+    }
+  }
+
+  onSubmit(): void {
+    if (this.bookForm.invalid) return;
+    this.formSubmit.emit(this.bookForm.value);
+  }
+
+  get isEditing(): boolean { return !!this.book; }
+
+  getError(field: string, error: string): boolean {
+    const ctrl = this.bookForm.get(field);
+    return !!(ctrl?.hasError(error) && ctrl?.touched);
+  }
+}
