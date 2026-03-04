@@ -1,0 +1,20 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f6f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+a { text-decoration: none; }
+
+/* Shared utility classes used across components */
+.alert { border-radius: 6px; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem; }
+.alert-success { background: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; }
+.alert-error { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
+
+/* Status badge classes used by overdueStatus pipe */
+.badge-issued { background: #d5f5e3 !important; color: #1e8449 !important; }
+.badge-overdue { background: #fadbd8 !important; color: #c0392b !important; }
+.badge-returned { background: #eee !important; color: #888 !important; }
