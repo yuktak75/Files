@@ -1,0 +1,25 @@
+import { Directive, Input, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
+
+@Directive({
+  selector: '[appRole]',
+  standalone: true
+})
+export class RoleDirective implements OnInit {
+  @Input() appRole: 'user' | 'librarian' = 'user';
+
+  constructor(
+    private templateRef: TemplateRef<unknown>,
+    private vcr: ViewContainerRef,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && user.role === this.appRole) {
+      this.vcr.createEmbeddedView(this.templateRef);
+    } else {
+      this.vcr.clear();
+    }
+  }
+}

@@ -1,0 +1,27 @@
+import { Directive, ElementRef, Input, HostListener, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]',
+  standalone: true
+})
+export class HighlightDirective implements OnInit {
+  @Input() highlightColor = '#eaf4fb';
+  private originalBg = '';
+
+  constructor(private el: ElementRef<HTMLElement>) {}
+
+  ngOnInit(): void {
+    this.originalBg = this.el.nativeElement.style.backgroundColor || '';
+  }
+
+  @HostListener('mouseenter')
+  onMouseEnter(): void {
+    this.el.nativeElement.style.backgroundColor = this.highlightColor;
+    this.el.nativeElement.style.transition = 'background-color 0.2s';
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeave(): void {
+    this.el.nativeElement.style.backgroundColor = this.originalBg;
+  }
+}
