@@ -1,0 +1,94 @@
+<div class="page-header">
+  <h1>Librarian Dashboard</h1>
+</div>
+
+<!-- Errors -->
+<div class="alert alert-error" *ngIf="statsError">{{ statsError }}</div>
+<div class="alert alert-error" *ngIf="overdueError">{{ overdueError }}</div>
+
+<!-- Stats loading -->
+<app-loading-spinner *ngIf="isLoadingStats"></app-loading-spinner>
+
+<!-- Stats grid -->
+<div class="stats-grid" *ngIf="!isLoadingStats">
+
+  <div class="stat-card" *ngIf="stats; else noStats">
+    <div class="stat-icon">📚</div>
+    <div class="stat-value">{{ stats.totalBooks }}</div>
+    <div class="stat-label">Total Books</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">👥</div>
+    <div class="stat-value">{{ stats?.totalUsers ?? '—' }}</div>
+    <div class="stat-label">Members</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value">{{ stats?.activeIssues ?? '—' }}</div>
+    <div class="stat-label">Active Loans</div>
+  </div>
+
+  <div class="stat-card warn">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-value">{{ stats?.overdueIssues ?? '—' }}</div>
+    <div class="stat-label">Overdue</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">💰</div>
+    <div class="stat-value">{{ stats?.totalFinesCollected ?? 0 | currency }}</div>
+    <div class="stat-label">Collected Fines</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-value">{{ stats?.pendingFines ?? 0 | currency }}</div>
+    <div class="stat-label">Pending Fines</div>
+  </div>
+
+</div>
+
+<ng-template #noStats>
+  <div class="stat-card empty">
+    <div class="stat-value">—</div>
+    <div class="stat-label">No data</div>
+  </div>
+</ng-template>
+
+<!-- Quick links -->
+<div class="quick-links">
+  <a routerLink="/librarian/books" class="quick-link">📖 Manage Books</a>
+  <a routerLink="/librarian/users" class="quick-link">👤 Manage Users</a>
+</div>
+
+<!-- Overdue section -->
+<section class="section">
+  <h2 class="section-title">Overdue Books</h2>
+
+  <app-loading-spinner *ngIf="isLoadingOverdue"></app-loading-spinner>
+
+  <div class="empty-state" *ngIf="!isLoadingOverdue && overdueItems.length === 0 && !overdueError">
+    No overdue books right now 🎉
+  </div>
+
+  <table class="data-table" *ngIf="!isLoadingOverdue && overdueItems.length > 0">
+    <thead>
+      <tr>
+        <th>Book</th>
+        <th>Member</th>
+        <th>Due Date</th>
+        <th>Fine</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of overdueItems; trackBy: trackById">
+        <td>{{ item.book?.title || '—' }}</td>
+        <td>{{ item.user?.fullName || item.user?.username || '—' }}</td>
+        <td>{{ item.dueDate | date:'mediumDate' }}</td>
+        <td class="fine-cell">{{ item.fineAmount | currency }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
