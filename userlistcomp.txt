@@ -1,0 +1,50 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component';
+import { User } from '../../models/user.model';
+
+@Component({
+  selector: 'app-user-list',
+  standalone: true,
+  imports: [CommonModule, LoadingSpinnerComponent],
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.css']
+})
+export class UserListComponent implements OnInit, OnDestroy {
+  users: User[] = [];
+  isLoading = false;
+  message = '';
+  messageType: 'success' | 'error' = 'success';
+  private destroy$ = new Subject<void>();
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void { this.loadUsers(); }
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  loadUsers(): void {
+    this.isLoading = true;
+    this.http.get<User[]>('http://localhost:3001/api/users').pipe(takeUntil(this.destroy$)).subscribe({
+      next: users => { this.users = users; this.isLoading = false; },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  toggleActive(user: User): void {
+    this.http.put<User>(`http://localhost:3001/api/users/${user.id}`, { isActive: !user.isActive })
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => { this.showMessage(`User ${user.isActive ? 'deactivated' : 'activated'}.`, 'success'); this.loadUsers(); },
+        error: () => this.showMessage('Failed to update user.', 'error')
+      });
+  }
+
+  trackByUserId(_: number, user: User): number { return user.id; }
+
+  private showMessage(msg: string, type: 'success' | 'error'): void {
+    this.message = msg; this.messageType = type;
+    setTimeout(() => this.message = '', 3000);
+  }
+}

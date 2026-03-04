@@ -1,0 +1,21 @@
+.page-header { margin-bottom: 1.5rem; }
+.page-header h1 { font-size: 1.8rem; color: #1a5276; font-weight: 700; }
+.data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.data-table th { background: #1a5276; color: white; padding: 0.7rem 1rem; text-align: left; font-size: 0.82rem; }
+.data-table td { padding: 0.7rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.88rem; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #f9f9f9; }
+.inactive-row td { opacity: 0.55; }
+code { font-family: monospace; background: #f0f0f0; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.82rem; }
+.role-badge { font-size: 0.72rem; font-weight: 600; padding: 0.2em 0.6em; border-radius: 4px; background: #eee; color: #666; text-transform: uppercase; }
+.role-librarian { background: #eaf4fb; color: #1a5276; }
+.has-fines { color: #c0392b; font-weight: 600; }
+.status-dot { font-size: 0.78rem; font-weight: 600; }
+.status-dot.active { color: #1e8449; }
+.status-dot.inactive { color: #c0392b; }
+.btn-toggle { font-size: 0.78rem; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-weight: 600; border: none; }
+.btn-deactivate { background: #fadbd8; color: #c0392b; }
+.btn-activate { background: #d5f5e3; color: #1e8449; }
+.alert { border-radius: 6px; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem; }
+.alert-success { background: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; }
+.alert-error { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
