@@ -1,0 +1,55 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component';
+
+interface DashboardStats {
+  totalBooks: number;
+  totalUsers: number;
+  activeIssues: number;
+  overdueIssues: number;
+  totalFinesCollected: number;
+  pendingFines: number;
+}
+
+interface OverdueItem {
+  id: number;
+  book?: { title: string };
+  user?: { fullName: string; username: string };
+  dueDate: string;
+  fineAmount: number;
+}
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, RouterLink, LoadingSpinnerComponent],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent implements OnInit, OnDestroy {
+  stats: DashboardStats | null = null;
+  overdueItems: OverdueItem[] = [];
+  isLoading = false;
+  private destroy$ = new Subject<void>();
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.isLoading = true;
+    this.http.get<DashboardStats>('http://localhost:3001/api/stats/dashboard')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: s => { this.stats = s; this.isLoading = false; }, error: () => { this.isLoading = false; } });
+
+    this.http.get<OverdueItem[]>('http://localhost:3001/api/stats/reports/overdue')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: items => this.overdueItems = items, error: () => {} });
+  }
+
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  trackById(_: number, item: OverdueItem): number { return item.id; }
+}
