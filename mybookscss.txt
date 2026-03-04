@@ -1,0 +1,89 @@
+.page-header { margin-bottom: 1.5rem; }
+.page-header h1 { font-size: 1.8rem; color: #1a5276; font-weight: 700; }
+.subtitle { color: #888; margin-top: 0.2rem; }
+
+.fines-banner {
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  color: #c0392b;
+}
+
+.fines-info { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.9rem; }
+
+.btn-pay-all {
+  background: #c0392b; color: white; border: none;
+  padding: 0.5rem 1.2rem; border-radius: 6px;
+  cursor: pointer; font-weight: 600; font-size: 0.85rem;
+}
+
+.section { margin-bottom: 2rem; }
+.section-title { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+
+.issues-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.issue-row {
+  background: white;
+  border-radius: 8px;
+  border: 1.5px solid #eee;
+  padding: 1rem 1.2rem;
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.issue-row.status-overdue { border-color: #f5c6cb; background: #fffafa; }
+.issue-row.status-issued { border-color: #a9dfbf; }
+.issue-row.status-returned { opacity: 0.7; }
+
+.issue-book-info strong { display: block; font-size: 0.95rem; color: #222; }
+.issue-meta { font-size: 0.78rem; color: #aaa; }
+
+.due-label { font-size: 0.75rem; color: #aaa; }
+.due-date { font-size: 0.88rem; font-weight: 600; display: block; }
+.overdue-text { color: #c0392b; }
+.days-remaining { font-size: 0.75rem; color: #888; }
+
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-issued .status-pill { background: #d5f5e3; color: #1e8449; }
+.status-overdue .status-pill { background: #fadbd8; color: #c0392b; }
+.returned-pill { background: #eee; color: #888; }
+
+.renewals-left { font-size: 0.72rem; color: #aaa; display: block; margin-top: 0.2rem; }
+.paid-badge { font-size: 0.7rem; background: #d5f5e3; color: #1e8449; padding: 0.1em 0.5em; border-radius: 3px; font-weight: 700; margin-left: 0.4rem; }
+
+.issue-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.btn-return, .btn-renew, .btn-pay {
+  font-size: 0.78rem; padding: 0.3rem 0.7rem;
+  border-radius: 4px; cursor: pointer; font-weight: 600; border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-return { background: #1a5276; color: white; }
+.btn-renew { background: #1e8449; color: white; }
+.btn-pay { background: #c0392b; color: white; }
+
+.btn-return:hover, .btn-renew:hover, .btn-pay:hover { opacity: 0.85; }
+
+.alert { border-radius: 6px; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem; }
+.alert-success { background: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; }
+.alert-error { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
+.empty-state { color: #aaa; padding: 1.5rem 0; font-size: 0.95rem; }
+
+@media (max-width: 700px) {
+  .issue-row { grid-template-columns: 1fr; }
+}

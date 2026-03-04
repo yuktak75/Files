@@ -1,0 +1,123 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { IssueService } from './issue.service';
+import { FineService } from './fine.service';
+import { AuthService } from '../auth/auth.service';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
+import { DaysUntilPipe } from '../shared/days-until.pipe';
+import { OverdueStatusPipe } from '../shared/overdue-status.pipe';
+import { Issue } from '../models/issue.model';
+import { FinesResponse } from '../models/fine.model';
+import { User } from '../models/user.model';
+
+@Component({
+  selector: 'app-my-books',
+  standalone: true,
+  imports: [CommonModule, LoadingSpinnerComponent, DaysUntilPipe, OverdueStatusPipe],
+  templateUrl: './my-books.component.html',
+  styleUrls: ['./my-books.component.css']
+})
+export class MyBooksComponent implements OnInit, OnDestroy {
+  currentUser: User | null = null;
+  issues: Issue[] = [];
+  fines: FinesResponse | null = null;
+  isLoading = false;
+  message = '';
+  messageType: 'success' | 'error' = 'success';
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private issueService: IssueService,
+    private fineService: FineService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
+      this.currentUser = user;
+      if (user) {
+        this.loadIssues(user.id);
+        this.loadFines(user.id);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadIssues(userId: number): void {
+    this.isLoading = true;
+    this.issueService.getUserIssues(userId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: issues => { this.issues = issues; this.isLoading = false; },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  loadFines(userId: number): void {
+    this.fineService.getUserFines(userId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: fines => this.fines = fines,
+      error: () => {}
+    });
+  }
+
+  returnBook(issueId: number): void {
+    this.issueService.returnBook(issueId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        this.showMessage(res.hasFine ? `Book returned. Fine: $${res.fine.toFixed(2)}` : 'Book returned successfully!', 'success');
+        if (this.currentUser) { this.loadIssues(this.currentUser.id); this.loadFines(this.currentUser.id); }
+      },
+      error: (err) => this.showMessage(err.error?.error || 'Failed to return book.', 'error')
+    });
+  }
+
+  renewBook(issueId: number): void {
+    this.issueService.renewBook(issueId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.showMessage('Book renewed for 7 more days!', 'success');
+        if (this.currentUser) this.loadIssues(this.currentUser.id);
+      },
+      error: (err) => this.showMessage(err.error?.error || 'Cannot renew this book.', 'error')
+    });
+  }
+
+  payFine(issueId: number): void {
+    this.fineService.payFine(issueId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        this.showMessage(`Paid $${res.amountPaid.toFixed(2)}. Remaining: $${res.remainingFines.toFixed(2)}`, 'success');
+        if (this.currentUser) this.loadFines(this.currentUser.id);
+      },
+      error: (err) => this.showMessage(err.error?.error || 'Payment failed.', 'error')
+    });
+  }
+
+  payAllFines(): void {
+    if (!this.currentUser) return;
+    this.fineService.payAllFines(this.currentUser.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.showMessage('All fines paid!', 'success');
+        if (this.currentUser) this.loadFines(this.currentUser.id);
+      },
+      error: () => this.showMessage('Payment failed.', 'error')
+    });
+  }
+
+  get activeIssues(): Issue[] {
+    return this.issues.filter(i => i.status !== 'returned');
+  }
+
+  get pastIssues(): Issue[] {
+    return this.issues.filter(i => i.status === 'returned');
+  }
+
+  trackByIssueId(_: number, issue: Issue): number { return issue.id; }
+
+  private showMessage(msg: string, type: 'success' | 'error'): void {
+    this.message = msg;
+    this.messageType = type;
+    setTimeout(() => this.message = '', 4000);
+  }
+}

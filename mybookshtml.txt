@@ -1,0 +1,88 @@
+<div class="page-header">
+  <h1>My Books</h1>
+  <p class="subtitle">Hello, {{ currentUser?.fullName || currentUser?.username }}! Here are your loans.</p>
+</div>
+
+<div class="alert" [class.alert-success]="messageType==='success'" [class.alert-error]="messageType==='error'" *ngIf="message">
+  {{ message }}
+</div>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+<!-- FINES BANNER -->
+<div class="fines-banner" *ngIf="fines && fines.unpaidFines > 0">
+  <div class="fines-info">
+    <strong>⚠ Outstanding Fines: {{ fines.unpaidFines | currency }}</strong>
+    <span>across {{ fines.unpaidIssuesCount }} issue(s)</span>
+  </div>
+  <button class="btn-pay-all" (click)="payAllFines()">Pay All</button>
+</div>
+
+<!-- ACTIVE LOANS -->
+<section class="section" *ngIf="!isLoading">
+  <h2 class="section-title">Active Loans ({{ activeIssues.length }})</h2>
+
+  <div class="empty-state" *ngIf="activeIssues.length === 0">You have no active loans.</div>
+
+  <div class="issues-list">
+    <div class="issue-row"
+      *ngFor="let issue of activeIssues; trackBy: trackByIssueId"
+      [ngClass]="{
+        'status-issued': issue.status === 'issued',
+        'status-overdue': issue.status === 'overdue'
+      }">
+      <div class="issue-book-info">
+        <strong>{{ issue.book?.title || 'Book #' + issue.bookId }}</strong>
+        <span class="issue-meta">Issued: {{ issue.issueDate | date:'mediumDate' }}</span>
+      </div>
+      <div class="issue-due">
+        <span class="due-label">Due:</span>
+        <span class="due-date" [class.overdue-text]="issue.status === 'overdue'">
+          {{ issue.dueDate | date:'mediumDate' }}
+        </span>
+        <span class="days-remaining">{{ issue.dueDate | daysUntil }}</span>
+      </div>
+      <div class="issue-status">
+        <span class="status-pill" [ngClass]="issue | overdueStatus">{{ issue.status }}</span>
+        <span class="renewals-left" *ngIf="issue.renewalCount < issue.maxRenewals">
+          {{ issue.maxRenewals - issue.renewalCount }} renewal(s) left
+        </span>
+      </div>
+      <div class="issue-actions">
+        <button class="btn-return" (click)="returnBook(issue.id)">Return</button>
+        <button class="btn-renew"
+          *ngIf="issue.status !== 'overdue' && issue.renewalCount < issue.maxRenewals"
+          (click)="renewBook(issue.id)">
+          Renew
+        </button>
+        <button class="btn-pay"
+          *ngIf="issue.fineAmount > 0 && !issue.finePaid"
+          (click)="payFine(issue.id)">
+          Pay Fine ({{ issue.fineAmount | currency }})
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAST LOANS -->
+<section class="section" *ngIf="!isLoading && pastIssues.length > 0">
+  <h2 class="section-title">History ({{ pastIssues.length }})</h2>
+  <div class="issues-list">
+    <div class="issue-row status-returned"
+      *ngFor="let issue of pastIssues; trackBy: trackByIssueId">
+      <div class="issue-book-info">
+        <strong>{{ issue.book?.title || 'Book #' + issue.bookId }}</strong>
+        <span class="issue-meta">Returned: {{ issue.returnDate | date:'mediumDate' }}</span>
+      </div>
+      <div class="issue-due">
+        <span>Fine: {{ issue.fineAmount | currency }}</span>
+        <span *ngIf="issue.finePaid" class="paid-badge">PAID</span>
+      </div>
+      <div class="issue-status">
+        <span class="status-pill returned-pill">Returned</span>
+      </div>
+      <div class="issue-actions"></div>
+    </div>
+  </div>
+</section>
