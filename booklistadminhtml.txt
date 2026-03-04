@@ -1,0 +1,41 @@
+<div class="page-header">
+  <h1>Manage Books</h1>
+  <button class="btn-add" (click)="onAddNew()">+ Add Book</button>
+</div>
+
+<div class="alert" [class.alert-success]="messageType==='success'" [class.alert-error]="messageType==='error'" *ngIf="message">{{ message }}</div>
+
+<app-book-form
+  *ngIf="showForm"
+  [book]="editingBook"
+  (formSubmit)="onFormSubmit($event)"
+  (formCancel)="showForm = false">
+</app-book-form>
+
+<app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+<table class="data-table" *ngIf="!isLoading">
+  <thead>
+    <tr><th>Title</th><th>Category</th><th>Year</th><th>Copies</th><th>Available</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let book of books; trackBy: trackByBookId">
+      <td><strong>{{ book.title | truncate:40 }}</strong></td>
+      <td>{{ book.category }}</td>
+      <td>{{ book.publishedYear }}</td>
+      <td>{{ book.totalCopies }}</td>
+      <td [class.low-copies]="book.availableCopies === 0">{{ book.availableCopies }}</td>
+      <td>
+        <button class="btn-edit" (click)="onEdit(book)">Edit</button>
+        <button class="btn-delete" (click)="deleteTarget = book">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<app-confirm-dialog
+  [visible]="!!deleteTarget"
+  [message]="'Delete \'' + (deleteTarget?.title || '') + '\'? This cannot be undone.'"
+  (confirmed)="onDeleteConfirm()"
+  (cancelled)="deleteTarget = null">
+</app-confirm-dialog>

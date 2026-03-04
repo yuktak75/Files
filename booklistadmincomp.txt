@@ -1,0 +1,75 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BookService } from '../../books/book.service';
+import { BookFormComponent } from './book-form.component';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component';
+import { TruncatePipe } from '../../shared/truncate.pipe';
+import { Book } from '../../models/book.model';
+
+@Component({
+  selector: 'app-book-list-admin',
+  standalone: true,
+  imports: [CommonModule, BookFormComponent, ConfirmDialogComponent, LoadingSpinnerComponent, TruncatePipe],
+  templateUrl: './book-list-admin.component.html',
+  styleUrls: ['./book-list-admin.component.css']
+})
+export class BookListAdminComponent implements OnInit, OnDestroy {
+  books: Book[] = [];
+  isLoading = false;
+  showForm = false;
+  editingBook: Book | null = null;
+  deleteTarget: Book | null = null;
+  message = '';
+  messageType: 'success' | 'error' = 'success';
+  private destroy$ = new Subject<void>();
+
+  constructor(private bookService: BookService) {}
+
+  ngOnInit(): void { this.loadBooks(); }
+
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  loadBooks(): void {
+    this.isLoading = true;
+    this.bookService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: books => { this.books = books; this.isLoading = false; },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  onAddNew(): void { this.editingBook = null; this.showForm = true; }
+
+  onEdit(book: Book): void { this.editingBook = book; this.showForm = true; }
+
+  onFormSubmit(data: Partial<Book>): void {
+    if (this.editingBook) {
+      this.bookService.update(this.editingBook.id, data).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => { this.showMessage('Book updated!', 'success'); this.showForm = false; this.loadBooks(); },
+        error: () => this.showMessage('Update failed.', 'error')
+      });
+    } else {
+      this.bookService.create(data).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => { this.showMessage('Book added!', 'success'); this.showForm = false; this.loadBooks(); },
+        error: () => this.showMessage('Failed to add book.', 'error')
+      });
+    }
+  }
+
+  onDeleteConfirm(): void {
+    if (!this.deleteTarget) return;
+    this.bookService.delete(this.deleteTarget.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { this.showMessage('Book deleted.', 'success'); this.deleteTarget = null; this.loadBooks(); },
+      error: (err) => { this.showMessage(err.error?.error || 'Cannot delete book.', 'error'); this.deleteTarget = null; }
+    });
+  }
+
+  trackByBookId(_: number, book: Book): number { return book.id; }
+
+  private showMessage(msg: string, type: 'success' | 'error'): void {
+    this.message = msg; this.messageType = type;
+    setTimeout(() => this.message = '', 3000);
+  }
+}

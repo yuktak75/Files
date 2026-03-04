@@ -1,0 +1,15 @@
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.page-header h1 { font-size: 1.8rem; color: #1a5276; font-weight: 700; }
+.btn-add { background: #1e8449; color: white; border: none; padding: 0.6rem 1.4rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+.data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.data-table th { background: #1a5276; color: white; padding: 0.7rem 1rem; text-align: left; font-size: 0.82rem; }
+.data-table td { padding: 0.7rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.88rem; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #f9f9f9; }
+.low-copies { color: #c0392b; font-weight: 600; }
+.btn-edit, .btn-delete { font-size: 0.78rem; padding: 0.28rem 0.7rem; border-radius: 4px; cursor: pointer; font-weight: 600; border: none; margin-right: 0.3rem; }
+.btn-edit { background: #eaf4fb; color: #1a5276; }
+.btn-delete { background: #fadbd8; color: #c0392b; }
+.alert { border-radius: 6px; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem; }
+.alert-success { background: #d5f5e3; color: #1e8449; border: 1px solid #a9dfbf; }
+.alert-error { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
